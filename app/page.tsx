@@ -62,16 +62,8 @@ export default function Home() {
   const [isApproachingDoor, setIsApproachingDoor] = useState(false);
   const [showWelcome, setShowWelcome] = useState(true);
 
-  const [guests, setGuests] = useState<CafeGuest[]>(() => {
-    if (typeof window === "undefined") return [];
-
-    try {
-      const saved = localStorage.getItem(STORAGE_KEY);
-      return saved ? JSON.parse(saved) : [];
-    } catch {
-      return [];
-    }
-  });
+  const [guests, setGuests] = useState<CafeGuest[]>([]);
+  const [hasHydrated, setHasHydrated] = useState(false);
 
   const [name, setName] = useState("");
   const [building, setBuilding] = useState("");
@@ -84,16 +76,35 @@ export default function Home() {
   const [typedA, setTypedA] = useState(0);
   const [typedB, setTypedB] = useState(0);
   const [typedC, setTypedC] = useState(0);
-  const [now, setNow] = useState(() => new Date());
+  const [now, setNow] = useState<Date | null>(null);
   const [workPlaceholder, setWorkPlaceholder] = useState(WORK_EXAMPLES[0]);
 
   useEffect(() => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(guests));
-  }, [guests]);
+    const hydrateTimer = window.setTimeout(() => {
+      try {
+        const saved = localStorage.getItem(STORAGE_KEY);
+        setGuests(saved ? JSON.parse(saved) : []);
+      } catch {
+        setGuests([]);
+      }
+      setHasHydrated(true);
+    }, 0);
+
+    return () => window.clearTimeout(hydrateTimer);
+  }, []);
 
   useEffect(() => {
+    if (!hasHydrated) return;
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(guests));
+  }, [guests, hasHydrated]);
+
+  useEffect(() => {
+    const nowTimer = window.setTimeout(() => setNow(new Date()), 0);
     const timer = window.setInterval(() => setNow(new Date()), 60000);
-    return () => window.clearInterval(timer);
+    return () => {
+      window.clearTimeout(nowTimer);
+      window.clearInterval(timer);
+    };
   }, []);
 
   useEffect(() => {
@@ -110,11 +121,13 @@ export default function Home() {
   }, []);
 
   const localTime = useMemo(
-    () =>
-      new Intl.DateTimeFormat([], {
+    () => {
+      if (!now) return "--:--";
+      return new Intl.DateTimeFormat([], {
         hour: "numeric",
         minute: "2-digit",
-      }).format(now),
+      }).format(now);
+    },
     [now],
   );
 
