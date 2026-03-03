@@ -42,18 +42,18 @@ const instrumentSerif = Instrument_Serif({
 });
 
 export const metadata: Metadata = {
-  title: "makesomething ☀️",
-  description: "build your first app with ai. look what i made!",
+  title: "the night cafe",
+  description: "a midnight cafe for builders to create in cozy company.",
   metadataBase: new URL("https://makesomething.so"),
   openGraph: {
-    title: "makesomething ☀️",
-    description: "look what i made!",
-    siteName: "makesomething",
+    title: "the night cafe",
+    description: "a midnight cafe for builders to create in cozy company.",
+    siteName: "the night cafe",
   },
   twitter: {
     card: "summary_large_image",
-    title: "makesomething ☀️",
-    description: "look what i made!",
+    title: "the night cafe",
+    description: "a midnight cafe for builders to create in cozy company.",
   },
 };
 
